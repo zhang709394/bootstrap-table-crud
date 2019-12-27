@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="zh-cn">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Hello, Bootstrap Table!</title>
+
+    <link rel="stylesheet" href="./lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./lib/bootstrap-table-master/dist/bootstrap-table.min.css">
+    <link rel="stylesheet" href="./lib/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css">
+    <style>
+        #table thead {
+            background: #5488c4;
+        }
+
+        .form-cent {
+            margin-top: 10px;
+
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div>
+            <h2>后台管理系统</h2>
+        </div>
+
+        <!-- 功能组 -->
+        <div class="l">
+            <div class="col-lg-6 form-cent">
+                <form class="form-inline">
+                    <select class="form-control btn-info" id="seled">
+                        <option value="course_name" class="glyphicon glyphicon-ok">课程名</option>
+                        <option value="author">作者</option>
+                        <option value="college">大学</option>
+                        <option value="category_Id">分类</option>
+                    </select>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="_like" placeholder="请输入查询的关键字">
+                    </div>
+                    <button type="button" class="btn btn-primary" id="query">查询</button>
+                    <button type="button" class="btn btn-success" id="addData">添加</button>
+                    <button type="button" class="btn btn-warning" id="btnEdit">修改</button>
+                    <button type="button" class="btn btn-danger" id="btnDel">删除</button>
+                </form>
+
+            </div>
+            <div id="toolbar" class="col-lg-3">
+            </div>
+        </div>
+
+
+
+        <table id="table">
+        </table>
+
+
+        <!-- 修改数据弹出的层 -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">修改用户数据</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="frmEdit">
+                            <div class="form-group">
+                                <label for="course_name_edit" class="control-label">课程名:</label>
+                                <input type="text" class="form-control" id="course_name_edit" name="course_name"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="author_edit" class="control-label">作者:</label>
+                                <input type="text" class="form-control" id="author_edit" name="author">
+                            </div>
+                            <div class="form-group">
+                                <label for="college_edit" class="control-label">大学:</label>
+                                <input type="text" class="form-control" id="college_edit" name="college">
+                            </div>
+                            <div class="form-group">
+                                <label for="category_Id_edit" class="control-label">分类:</label>
+                                <select class="form-control" id='category_Id_edit' name="category_Id">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+
+                        </form>
+
+                        <!-- <form id="frmEdit">
+                            <table>
+                                <tr>
+                                    <td>课程名</td>
+                                    <td>
+                                        <input type="text" name="course_name" class="course_name">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>作者</td>
+                                    <td>
+                                        <input type="text" name="author" class="author">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>大学</td>
+                                    <td>
+                                        <input type="text" name="college" class="college">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>分类</td>
+                                    <td>
+                                        <select name="category_Id" class="category_Id">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form> -->
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="editRow">修改</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 添加数据弹出的层 -->
+        <div class="modal fade" id="addDialog" tabindex="-1" role="dialog" aria-labelledby="addDialogTitle">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="addDialogTitle">添加用户数据</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="frmAdd">
+                            <div class="form-group">
+                                <label for="course_name" class="control-label">课程名:</label>
+                                <input type="text" class="form-control" id="course_name" name="course_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="author" class="control-label">作者:</label>
+                                <input type="text" class="form-control" id="author" name="author">
+                            </div>
+                            <div class="form-group">
+                                <label for="college" class="control-label">大学:</label>
+                                <input type="text" class="form-control" id="college" name="college">
+                            </div>
+                            <div class="form-group">
+                                <label for="category_Id" class="control-label">分类:</label>
+                                <select class="form-control" id='category_Id' name="category_Id">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+
+                        </form>
+
+                        <!-- <form id="frmAdd">
+                            <table>
+                                <tr>
+                                    <td>课程名</td>
+                                    <td>
+                                        <input type="text" name="course_name" id="course_name">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>作者</td>
+                                    <td>
+                                        <input type="text" name="author" id="author">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>大学</td>
+                                    <td>
+                                        <input type="text" name="college" id="college">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>分类</td>
+                                    <td>
+                                        <select name="category_Id" id="category_Id">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form> -->
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="addRow">添加</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal" id="addCloseBtn">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 双击显示详情弹出的层 -->
+        <div class="modal fade" id="showRow" tabindex="-1" role="dialog" aria-labelledby="showRowData">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="showRowData">显示用户数据</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="tb-course-data">
+
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分页 -->
+        <div id="pagerBox"></div>
+    </div>
+
+
+
+    <!-- 显示详情的模板 -->
+    <script id="showInfoDialogTmpl" type="text/html">
+        <h3>课程详情</h3>
+        <table>
+            <tr>
+                <td>课程id: &nbsp;&nbsp;</td>
+                <td id='cid'>{{id}}</td>
+            </tr>
+            <tr>
+                <td>课程名字: &nbsp;&nbsp;</td>
+                <td id='cName'>{{course_name}}</td>
+            </tr>
+            <tr>
+                <td>课程大学: &nbsp;&nbsp;</td>
+                <td id='cCol'>{{college}}</td>
+            </tr>
+            <tr>
+                <td>课程作者: &nbsp;&nbsp;</td>
+                <td id='cAut'>{{author}}</td>
+            </tr>
+            <tr>
+                <td>课程分类: &nbsp;&nbsp;</td>
+                <td id='cCat'>{{category_Id}}</td>
+            </tr>
+        </table>
+    </script>
+
+
+    <script src="./lib/jquery-1.12.4.min.js"></script>
+    <script src="./lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <script src="./lib/bootstrap-table-master/dist/bootstrap-table.js"></script>
+    <script src="./lib/bootstrap-table-master/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+    <script src="./lib/template-web.js"></script>
+
+    <script>
+        $(function () {
+            //1.初始化Table
+            var oTable = new TableInit();
+            // var rowsData = oTable.ajaxcustomize();
+            // console.log(rowsData);
+
+            oTable.Init();
+
+            //编辑按钮
+            btnEdit();
+
+            //删除按钮
+            btnDel();
+
+            //添加按钮
+            addData();
+
+            //查询
+            query();
+        });
+
+
+
+        var TableInit = function () {
+            var oTableInit = new Object();
+            //初始化Table
+            oTableInit.Init = function () {
+                $('#table').bootstrapTable({
+                    url: '/api/course/',         //请求后台的URL（*）
+                    method: 'get',                      //请求方式（*）
+                    toolbar: '#toolbar',                //工具按钮用哪个容器
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: true,                   //是否显示分页（*）
+                    paginationPreText: '上一页',
+                    paginationNextText: '下一页',
+                    sortable: false,                     //是否启用排序
+                    sortOrder: "desc",                   //排序方式
+                    // queryParamsType: 'limit',
+                    queryParams: oTableInit.queryParams,//传递参数（*）
+                    sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                    pageNumber: 1,                       //初始化加载第一页，默认第一页
+                    pageSize: 10,                       //每页的记录行数（*）
+                    pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                    // search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                    contentType: "application/x-www-form-urlencoded",
+                    strictSearch: true,                 //设置为 true启用 全匹配搜索，否则为模糊搜索
+                    showColumns: true,                  //是否显示所有的列
+                    showRefresh: true,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    // height: 700,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                    uniqueId: "id",                     //每一行的唯一标识，一般为主键列
+                    showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    detailView: false,                //是否显示父子表
+                    // ajax: function (result) {
+                    //     $.ajax({
+                    //         type: "GET",
+                    //         url: '/api/course/',
+                    //         dataType: "json",
+                    //         data: JSON.stringify(oTableInit.queryParams),
+                    //         // data: { _limit: 10, _pager: 2 },
+                    //         success: function (resdata) {
+                    //             // var total = parseInt(xhr.getResponseHeader('X-Total-Count'));
+                    //             // result.success({
+                    //             //     rows: resdata,
+                    //             //     total: 256
+                    //             // });
+                    //             $('#table').bootstrapTable('load', resdata);
+                    //         },
+                    //         error: function (resdata) {
+                    //             alert("错误");
+                    //         }
+                    //     });
+                    // },
+                    responseHandler: responseHandler,
+                    // load: oTableInit.ajaxcustomize,
+                    onLoadSuccess: function (data) {
+                        console.log(data);
+                    },
+                    onDblClickRow: function (row, $element, field) {
+                        // console.log(row, $element, field);
+                        var html = template('showInfoDialogTmpl', row);
+                        // console.log(html);
+                        $('.tb-course-data').html(html);
+                        $('#showRow').modal('show');
+
+
+                    },
+                    columns: [[
+                        { field: 'ck', checkbox: true, align: 'left', width: 50 },
+                        {
+                            field: 'id', title: '编号', width: 80
+                        },
+                        { field: 'course_name', title: '课程名', width: 120 },
+                        { field: 'author', title: '作者', width: 120 },
+                        { field: 'college', title: '大学', width: 220 },
+                        {
+                            field: 'category_Id', title: '分类', width: 120, formatter: function (value, row, index) {
+                                return '分类' + value;
+                            }
+                        },
+                        {
+                            field: 'action', title: '操作', width: 120, formatter: function (value, row, index) {
+                                var html = '';
+                                // console.log(row, value, index);
+
+                                html += '<a href="javascript:" class="btn btn-warning" onclick="editRow(' + row.id + ')"  uid="' + row.id + '">修改</a>';
+                                html += '&nbsp;&nbsp;&nbsp;';
+                                html += '<a href="javascript:" class="btn btn-danger" onclick="delRow(' + row.id + ')">删除</a>';
+
+                                return html;
+                            }
+                        },
+                    ]],
+                    rowStyle: function (row, index) {
+                        var classesArr = ['success', 'info'];
+                        var strclass = "";
+                        if (index % 2 === 0) {//偶数行
+                            strclass = classesArr[0];
+                        } else {//奇数行
+                            strclass = classesArr[1];
+                        }
+                        return { classes: strclass };
+                    },//隔行变色
+                });
+
+            };
+
+
+            //得到查询的参数
+            oTableInit.queryParams = function (params) {
+                var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                    _limit: params.limit,   //页面大小
+                    _page: params.offset / params.limit + 1,
+                    _sort: 'id',
+                    _order: 'desc',
+                    // _like: $('#_like').val()
+                };
+                console.log(temp);
+
+                return temp;
+            };
+
+
+            function ajaxReqDate(result) {
+                console.log(result);
+                console.log(JSON.stringify(oTableInit.queryParams));
+
+                $.ajax({
+                    type: "GET",
+                    url: '/api/course/',
+                    dataType: "json",
+                    // data: JSON.stringify(oTableInit.queryParams),
+                    data: { _limit: 10, _pager: 2 },
+                    success: function (resdata) {
+                        // var total = parseInt(xhr.getResponseHeader('X-Total-Count'));
+                        result.success({
+                            rows: resdata,
+                            total: 256
+                        });
+                        $('#table').bootstrapTable('load', resdata);
+                    },
+                    error: function (resdata) {
+                        alert("错误");
+                    }
+                });
+            }
+
+
+            //自定义数据格式
+            function responseHandler(result) {
+                var temp = {
+                    // 下面这两个参数是必须有的, 名称不能变
+                    // 总的数量
+                    total: 265,
+                    // 数据
+                    rows: result
+                };
+
+                return temp;
+            }
+
+
+
+            return oTableInit;
+
+        };
+
+
+        //修改数据
+        function editRow(id) {
+
+            var row = $('#table').bootstrapTable('getRowByUniqueId', id);
+            if (!row) {
+                return;
+            }
+            console.log(row);
+
+            $('#course_name_edit').val(row.course_name);
+            $('#author_edit').val(row.author);
+            $('#college_edit').val(row.college);
+            $('#category_Id_edit option').each(function (i) {
+                // console.log(val);
+                if ((i + 1) == row.category_Id) {
+                    $($('#category_Id_edit option')[i]).prop('selected', 'selected');
+                }
+            });
+            $('#myModal').modal('show');
+
+            $('#editRow').off('click');
+            $('#editRow').on('click', function () {
+                $.ajax({
+                    url: 'api/course/' + id,
+                    data: $('#frmEdit').serialize(),
+                    dataType: 'json',
+                    type: 'PUT'
+                }).done(function (data) {
+                    console.log('修改成功');
+                    $('#frmEdit')[0].reset();
+                    $('#myModal').modal('hide');
+                    $('#table').bootstrapTable('refresh');
+                }).fail(function (data) {
+                    alert('修改失败，请重新操作！');
+
+                });
+
+            })
+        }
+
+        // $('#editRow').on('click', function () {
+        //     let id = $(this).attr('uid');
+        //     saveRow(id);
+        // })
+        //保存修改数据
+        // function saveRow(id) {
+        //     alert($('#course_name').val())
+        //     console.log($('#frmEdit').serialize());
+        //     $.ajax({
+        //         url: 'api/course/' + id,
+        //         data: $('#frmEdit').serialize(),
+        //         dataType: 'json',
+        //         type: 'PUT'
+        //     }).done(function (data) {
+        //         console.log('修改成功');
+        //         $('#myModal').modal('hide');
+        //         $('#table').bootstrapTable('refresh');
+        //     })
+
+        // }
+
+        //删除数据
+        function delRow(id) {
+            if (!confirm('您是否要删除id为' + id + '的数据？')) {
+                return;
+            }
+
+            $.ajax({
+                url: '/api/course/' + id,
+                type: 'DELETE',
+                dataType: 'json'
+            }).done(function (data) {
+                console.log('删除成功');
+                $('#table').bootstrapTable('refresh');
+
+            }).fail(function (data) {
+                alert('删除用户失败，请重新操作！');
+                $('#table').bootstrapTable('refresh');
+            })
+
+        }
+
+        //添加数据
+        function addData() {
+            $('#addData').on('click', function () {
+                $('#addDialog').modal('show');
+
+                $('#addRow').off('click');
+                $('#addRow').on('click', function () {
+                    // console.log($('#frmAdd').serialize());
+                    var arrData = $('#frmAdd').serializeArray();
+                    arrData.push({
+                        name: 'id',
+                        value: Date.now()
+                    });
+
+                    $.ajax({
+                        url: '/api/course',
+                        type: 'POST',
+                        data: arrData,
+                        dataType: 'json',
+                    }).done(function (data) {
+                        console.log('添加成功');
+                        //清空表单
+                        $('#frmAdd')[0].reset();
+                        $('#addDialog').modal('hide');
+                        $('#table').bootstrapTable('refresh');
+                    }).fail(function (data) {
+                        alert('添加失败，请重新操作！')
+                    })
+
+                });
+
+                $('#addCloseBtn').on('click', function () {
+                    $('#frmAdd')[0].reset();
+                });
+
+            })
+
+        }
+
+
+        //删除按钮
+        function btnDel() {
+            $('#btnDel').off('click');
+            $('#btnDel').on('click', function () {
+                var row = $('#table').bootstrapTable('getSelections');
+                console.log(row);
+
+                if (row.length > 1 || row.length <= 0) {
+                    alert('请选中一行再操作');
+                    return;
+                }
+                // console.log(row[0].id);
+                delRow(row[0].id);
+            })
+        }
+
+        //编辑按钮
+        function btnEdit() {
+            $('#btnEdit').off('click');
+            $('#btnEdit').on('click', function () {
+                var row = $('#table').bootstrapTable('getSelections');
+                console.log(row);
+
+                if (row.length > 1 || row.length <= 0) {
+                    alert('请选中一行再操作');
+                    return;
+                }
+                editRow(row[0].id)
+
+            })
+        }
+
+        //查询
+        function query() {
+            $('#query').on('click', function () {
+                if ($('#_like').val() == '') {
+                    alert('请输入关键字后再进行搜索！！！')
+                    return;
+                }
+                var name = $("#seled option:selected").val();
+                console.log(name);
+
+                // $('#table').bootstrapTable({ ref });
+                $('#table').bootstrapTable('refresh', { url: '/api/course/?' + name + '_like=' + $('#_like').val() });
+            })
+
+        }
+
+    </script>
+</body>
+
+</html>
