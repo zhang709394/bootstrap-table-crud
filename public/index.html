@@ -31,7 +31,7 @@
         </div>
 
         <!-- 功能组 -->
-        <div class="l">
+        <div>
             <div class="col-lg-6 form-cent">
                 <form class="form-inline">
                     <select class="form-control btn-info" id="seled">
@@ -70,7 +70,10 @@
                         <h4 class="modal-title" id="myModalLabel">修改用户数据</h4>
                     </div>
                     <div class="modal-body">
-                        <form id="frmEdit">
+                        <div class="tb-edit-data">
+
+                        </div>
+                        <!-- <form id="frmEdit">
                             <div class="form-group">
                                 <label for="course_name_edit" class="control-label">课程名:</label>
                                 <input type="text" class="form-control" id="course_name_edit" name="course_name"
@@ -95,44 +98,7 @@
                                 </select>
                             </div>
 
-                        </form>
-
-                        <!-- <form id="frmEdit">
-                            <table>
-                                <tr>
-                                    <td>课程名</td>
-                                    <td>
-                                        <input type="text" name="course_name" class="course_name">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>作者</td>
-                                    <td>
-                                        <input type="text" name="author" class="author">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>大学</td>
-                                    <td>
-                                        <input type="text" name="college" class="college">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>分类</td>
-                                    <td>
-                                        <select name="category_Id" class="category_Id">
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
-                                            <option value="5">5</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            </table>
                         </form> -->
-
-
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" id="editRow">修改</button>
@@ -178,41 +144,6 @@
                             </div>
 
                         </form>
-
-                        <!-- <form id="frmAdd">
-                            <table>
-                                <tr>
-                                    <td>课程名</td>
-                                    <td>
-                                        <input type="text" name="course_name" id="course_name">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>作者</td>
-                                    <td>
-                                        <input type="text" name="author" id="author">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>大学</td>
-                                    <td>
-                                        <input type="text" name="college" id="college">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>分类</td>
-                                    <td>
-                                        <select name="category_Id" id="category_Id">
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
-                                            <option value="5">5</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            </table>
-                        </form> -->
 
 
                     </div>
@@ -278,6 +209,35 @@
             </tr>
         </table>
     </script>
+    <!-- 修改的模板 -->
+    <script id="editInfoDialogTmpl" type="text/html">
+        <form id="frmEdit">
+            <div class="form-group">
+                <label for="course_name_edit" class="control-label">课程名:</label>
+                <input type="text" class="form-control" id="course_name_edit" name="course_name" value="{{course_name}}"
+                    required>
+            </div>
+            <div class="form-group">
+                <label for="author_edit" class="control-label">作者:</label>
+                <input type="text" class="form-control" id="author_edit" name="author" value="{{author}}">
+            </div>
+            <div class="form-group">
+                <label for="college_edit" class="control-label">大学:</label>
+                <input type="text" class="form-control" id="college_edit" name="college" value="{{college}}">
+            </div>
+            <div class="form-group">
+                <label for="category_Id_edit" class="control-label">分类:</label>
+                <select class="form-control" id='category_Id_edit' name="category_Id" value="{{category_Id}}">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+
+        </form>
+    </script>
 
 
     <script src="./lib/jquery-1.12.4.min.js"></script>
@@ -285,14 +245,23 @@
     <script src="./lib/bootstrap-table-master/dist/bootstrap-table.js"></script>
     <script src="./lib/bootstrap-table-master/dist/locale/bootstrap-table-zh-CN.min.js"></script>
     <script src="./lib/template-web.js"></script>
+    <script src="./lib/js.cookie-2.2.1.min.js"></script>
+    <script src="./js/ajaxsetup.js"></script>
 
     <script>
         $(function () {
-            //1.初始化Table
-            var oTable = new TableInit();
-            // var rowsData = oTable.ajaxcustomize();
-            // console.log(rowsData);
+            if (!Cookies.get('auth_token')) {
+                setInterval(function () {
+                    window.location.href = './login.html'
+                }, 2000);
 
+                alert('请先登录!2秒后自动跳转到登录页面');
+                return;
+            }
+
+
+            //初始化Table
+            var oTable = new TableInit();
             oTable.Init();
 
             //编辑按钮
@@ -307,8 +276,6 @@
             //查询
             query();
         });
-
-
 
         var TableInit = function () {
             var oTableInit = new Object();
@@ -343,28 +310,7 @@
                     showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
                     cardView: false,                    //是否显示详细视图
                     detailView: false,                //是否显示父子表
-                    // ajax: function (result) {
-                    //     $.ajax({
-                    //         type: "GET",
-                    //         url: '/api/course/',
-                    //         dataType: "json",
-                    //         data: JSON.stringify(oTableInit.queryParams),
-                    //         // data: { _limit: 10, _pager: 2 },
-                    //         success: function (resdata) {
-                    //             // var total = parseInt(xhr.getResponseHeader('X-Total-Count'));
-                    //             // result.success({
-                    //             //     rows: resdata,
-                    //             //     total: 256
-                    //             // });
-                    //             $('#table').bootstrapTable('load', resdata);
-                    //         },
-                    //         error: function (resdata) {
-                    //             alert("错误");
-                    //         }
-                    //     });
-                    // },
-                    responseHandler: responseHandler,
-                    // load: oTableInit.ajaxcustomize,
+                    responseHandler: responseHandler,  //数据格式，处理成支持的格式要求
                     onLoadSuccess: function (data) {
                         console.log(data);
                     },
@@ -393,8 +339,6 @@
                         {
                             field: 'action', title: '操作', width: 120, formatter: function (value, row, index) {
                                 var html = '';
-                                // console.log(row, value, index);
-
                                 html += '<a href="javascript:" class="btn btn-warning" onclick="editRow(' + row.id + ')"  uid="' + row.id + '">修改</a>';
                                 html += '&nbsp;&nbsp;&nbsp;';
                                 html += '<a href="javascript:" class="btn btn-danger" onclick="delRow(' + row.id + ')">删除</a>';
@@ -414,9 +358,7 @@
                         return { classes: strclass };
                     },//隔行变色
                 });
-
             };
-
 
             //得到查询的参数
             oTableInit.queryParams = function (params) {
@@ -425,53 +367,29 @@
                     _page: params.offset / params.limit + 1,
                     _sort: 'id',
                     _order: 'desc',
-                    // _like: $('#_like').val()
                 };
                 console.log(temp);
-
                 return temp;
             };
 
 
-            function ajaxReqDate(result) {
-                console.log(result);
-                console.log(JSON.stringify(oTableInit.queryParams));
-
-                $.ajax({
-                    type: "GET",
-                    url: '/api/course/',
-                    dataType: "json",
-                    // data: JSON.stringify(oTableInit.queryParams),
-                    data: { _limit: 10, _pager: 2 },
-                    success: function (resdata) {
-                        // var total = parseInt(xhr.getResponseHeader('X-Total-Count'));
-                        result.success({
-                            rows: resdata,
-                            total: 256
-                        });
-                        $('#table').bootstrapTable('load', resdata);
-                    },
-                    error: function (resdata) {
-                        alert("错误");
-                    }
-                });
-            }
-
 
             //自定义数据格式
-            function responseHandler(result) {
+            function responseHandler(result, jqXHR) {
+                var total = parseInt(jqXHR.getResponseHeader('X-Total-Count'));
                 var temp = {
                     // 下面这两个参数是必须有的, 名称不能变
                     // 总的数量
-                    total: 265,
+                    total: total,
                     // 数据
-                    rows: result
+                    rows: result.data
                 };
+                console.log(total);
 
                 return temp;
+
+
             }
-
-
 
             return oTableInit;
 
@@ -487,9 +405,11 @@
             }
             console.log(row);
 
-            $('#course_name_edit').val(row.course_name);
-            $('#author_edit').val(row.author);
-            $('#college_edit').val(row.college);
+            var html = template('editInfoDialogTmpl', row);
+            $('.tb-edit-data').html(html);
+            // $('#course_name_edit').val(row.course_name);
+            // $('#author_edit').val(row.author);
+            // $('#college_edit').val(row.college);
             $('#category_Id_edit option').each(function (i) {
                 // console.log(val);
                 if ((i + 1) == row.category_Id) {
@@ -518,26 +438,7 @@
             })
         }
 
-        // $('#editRow').on('click', function () {
-        //     let id = $(this).attr('uid');
-        //     saveRow(id);
-        // })
-        //保存修改数据
-        // function saveRow(id) {
-        //     alert($('#course_name').val())
-        //     console.log($('#frmEdit').serialize());
-        //     $.ajax({
-        //         url: 'api/course/' + id,
-        //         data: $('#frmEdit').serialize(),
-        //         dataType: 'json',
-        //         type: 'PUT'
-        //     }).done(function (data) {
-        //         console.log('修改成功');
-        //         $('#myModal').modal('hide');
-        //         $('#table').bootstrapTable('refresh');
-        //     })
 
-        // }
 
         //删除数据
         function delRow(id) {
@@ -640,10 +541,11 @@
                     return;
                 }
                 var name = $("#seled option:selected").val();
-                console.log(name);
+                // console.log(name);
 
-                // $('#table').bootstrapTable({ ref });
                 $('#table').bootstrapTable('refresh', { url: '/api/course/?' + name + '_like=' + $('#_like').val() });
+
+
             })
 
         }

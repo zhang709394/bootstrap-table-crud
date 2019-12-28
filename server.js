@@ -17,20 +17,20 @@ server.get('/echo', (req, res) => {
 });
 
 
-// server.post('/authorized', (req, res) => {
-//     if (req.body.username === 'admin' && req.body.userpwd === 'qGmtERMivHBKt6EgXzMoGEXXCG8') {
-//         res.jsonp({
-//             code: 1,
-//             msg: '登录成功',
-//             auth_token: 'sadgfdsaw42sdfs'
-//         })
-//     } else {
-//         res.jsonp({
-//             code: 8,
-//             msg: '登录失败！用户名或密码不正确！'
-//         })
-//     }
-// });
+server.post('/authorized', (req, res) => {
+    if (req.body.username === 'admin' && req.body.userpwd === 'qGmtERMivHBKt6EgXzMoGEXXCG8') {
+        res.jsonp({
+            code: 1,
+            msg: '登录成功',
+            auth_token: 'sadgfdsaw42sdfs'
+        })
+    } else {
+        res.jsonp({
+            code: 8,
+            msg: '登录失败！用户名或密码不正确！'
+        })
+    }
+});
 
 
 // 给post的请求返回创建时间的属性
@@ -42,29 +42,27 @@ server.use((req, res, next) => {
 });
 
 // //这是挂在用户校验的中间件
-// server.use((req, res, next) => {
-//     // isAuthorized就是你自己校验的逻辑
-//     if (req.get('Authorization')) { // add your authorization logic here
-//         next(); // continue to JSON Server router
-//     } else {
-//         res.status(401).jsonp({
-//             code: 7, //7是未登录
-//             msg: '没有登录，不能访问'
-//         })
-//     }
-// })
+server.use((req, res, next) => {
+    // isAuthorized就是你自己校验的逻辑
+    if (req.get('Authorization')) { // add your authorization logic here
+        next(); // continue to JSON Server router
+    } else {
+        res.status(401).jsonp({
+            code: 7, //7是未登录
+            msg: '没有登录，不能访问'
+        })
+    }
+})
 
 
 router.render = (req, res) => {
-    // res.jsonp({
-    //     code: 1,
-    //     msg: 'ok',
-    //     data: res.locals.data
-    // })
-    // console.log(res.body);
 
+    res.jsonp({
+        code: 1,
+        msg: 'ok',
+        data: res.locals.data
+    })
 
-    res.jsonp(res.locals.data)
 }
 
 server.use('/api', router);

@@ -1,6 +1,5 @@
 {
-  "course": [
-    {
+  "course": [{
       "id": 1000,
       "course_name": "建明没去它拉期水地",
       "author": "唐平",
@@ -1810,38 +1809,21 @@
       "category_Id": "5",
       "id": "1577406299977",
       "createdAt": 1577406300003
-    }
-  ],
-  "course_category": [
-    {
-      "id": 1,
-      "pid": -1,
-      "cName": "指导求性"
     },
     {
-      "id": 2,
-      "pid": -1,
-      "cName": "质通写青"
+      "course_name": "dfdfdf",
+      "author": "asssad2",
+      "college": "fffff",
+      "category_Id": "3",
+      "id": "1577518681259",
+      "createdAt": 1577518681263
     },
     {
-      "id": 3,
-      "pid": -1,
-      "cName": "海器原军"
-    },
-    {
-      "id": 4,
-      "pid": -1,
-      "cName": "题化生金"
-    },
-    {
-      "id": 5,
-      "pid": -1,
-      "cName": "化小运象"
-    },
-    {
-      "id": 6,
-      "pid": -1,
-      "cName": "工易你向"
+      "course_name": "撒旦法苟富贵说是",
+      "author": "规范化个4444",
+      "college": "湖广会馆3333撒旦",
+      "category_Id": "4",
+      "id": "1577546160924"
     }
   ]
 }

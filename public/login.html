@@ -1,12 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="./lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="./lib/bootstrap-table-master/dist/bootstrap-table.min.css">
+    <!-- 引入easyUI的css 和js  -->
+    <link rel="stylesheet" href="./lib/jquery-easyui/themes/bootstrap/easyui.css">
+    <link rel="stylesheet" href="./lib/jquery-easyui/themes/icon.css">
+
+    <script src="./lib/jquery-easyui/jquery.min.js"></script>
+    <!-- easyui的全部脚本 -->
+    <script src="./lib/jquery-easyui/jquery.easyui.min.js"></script>
+    <!-- 语言包 -->
+    <script src="./lib/jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
+
+    <script src="./lib/sha1.js"></script>
+
+    <script src="./lib/js.cookie-2.2.1.min.js"></script>
+
     <title>AICODER 登录</title>
     <style>
         html,
@@ -31,54 +43,87 @@
             margin-left: -151px;
             margin-top: -101px;
         }
+
+        #frmLogin {
+            padding: 50px;
+        }
+
+        .btn {
+            height: 30px;
+            width: 80px;
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <div class="login-wrap col-lg-4">
-            <form id="frmLogin">
-                <table>
-                    <tr>
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon1">用户名：</span>
-                            <input type="text" class="form-control" placeholder="请输入用户名"
-                                aria-describedby="basic-addon1">
-                        </div>
-                    </tr>
-                    <tr>
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon2">密码：</span>
-                            <input type="text" class="form-control" placeholder="请输入密码" aria-describedby="basic-addon2">
-                        </div>
-                    </tr>
-                    <tr>
-                        <td>
-                            <button type="submit" class="btn btn-primary" id="login">登录</button>
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div>
+    <div class="login-wrap">
+        <form action="" id="frmLogin">
+            <table>
+                <tr>
+                    <td>用户名：</td>
+                    <td>
+                        <input type="text" name="username" class="easyui-textbox"
+                            data-options="iconCls:'icon-man',prompt:'用户名',required:true,validType:['length[3,8]']">
+                    </td>
+                </tr>
+                <tr>
+                    <td>密 码：</td>
+                    <td>
+                        <input type="password" value="aicoder" name="userpwd" class="easyui-passwordbox" prompt="密码"
+                            data-options="required:true,validType:['length[3,18]']">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input class="easyui-linkbutton btn" type="button" value="登录" id="btnLogin">
+                    </td>
+                </tr>
+            </table>
+        </form>
     </div>
 
-
-    <script src="./lib/jquery-1.12.4.min.js"></script>
-    <script src="./lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
-    <script src="./lib/bootstrap-table-master/dist/bootstrap-table.js"></script>
-    <script src="./lib/bootstrap-table-master/dist/locale/bootstrap-table-zh-CN.min.js"></script>
-    <!-- <script src="./lib/sha1.js"></script> -->
-    <!-- <script src="./lib/js.cookie-2.2.1.min.js"></script> -->
-
     <script>
-        $('#login').on('click', function () {
-            console.log($('#frmLogin').serialize());
-            console.log('123');
+
+        $('#btnLogin').on('click', function () {
+            //校验整个表单中的所有的校验的文本框是否都校验成功
+            if ($('#frmLogin').form('validate')) {
+                // $.messager.alert('提示消息', '全部通过', 'info');
+
+                //把表单中的数据拿到
+                var frmDataArr = $('#frmLogin').serializeArray();
+                frmDataArr[1].value = b64_sha1(frmDataArr[1].value);
+                console.dir(frmDataArr);
 
 
-        });
+                //发送ajax请求后台，校验用户名和密码是否正确
 
+                $.ajax({
+                    url: '/authorized',
+                    type: 'POST',
+                    data: frmDataArr,
+                    success: function (data) {
+                        //登录成功：{code:1,msg:'成功',auth_token:'sdfasd[[]]fasd'}
+                        //登录失败：{code:8,msg:'登录失败，用户名或密码不正确...'}
+                        if (data.code === 8) {
+                            $.messager.alert('提示消息', '登录失败', 'warning')
+                        } else {
+                            // $.messager.alert('提示消息', '登录成功', 'info')
+
+                            // 后台返回登录的tocken，放到我们的cookie中，主页面就可以通过cookie拿到auth-token
+                            Cookies.set('auth_token', data.auth_token, { path: '/' });
+
+                            window.location.href = './index.html'
+
+                        }
+                    }
+                })
+
+            } else {
+                $.messager.alert('提示消息', '请输入规范的用户名和密码', 'warning')
+            }
+
+        })
     </script>
 </body>
 
